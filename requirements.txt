@@ -1,0 +1,2 @@
+python-dotenv>=0.10.5
+praw>=6.5.1
