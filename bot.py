@@ -22,6 +22,13 @@ sites = [
     ["detik.com", "single=1"]
 ]
 
+# Check for post to reply
+def post_matches(post, site, query):
+    is_new = post.id not in replied_posts
+    contains_site = site in post.domain
+    contains_query = query in post.url
+    return is_new and contains_site and not contains_query
+
 # Create a list of replied posts
 if not os.path.isfile("replied_posts.txt"):
     replied_posts = []
@@ -45,7 +52,7 @@ def reply(url, query):
 # Get the list of posts to reply to
 for post in subreddit.new(limit=5):
     for site in sites:
-        if post.id not in replied_posts and site[0] in post.domain and not site[1] in post.url:
+        if post_matches(post, site[0], site[1]):
             reply(post.url, site[1])
             replied_posts.append(post.id)
 
