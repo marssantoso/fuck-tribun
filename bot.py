@@ -14,6 +14,13 @@ load_dotenv(dotenv_path=env_path)
 reddit = praw.Reddit(os.getenv("BOT_NAME"))
 subreddit = reddit.subreddit(os.getenv("SUBREDDIT"))
 
+# List sites and configs
+sites = [
+    ["tribunnews.com", "page=all"],
+    ["kompas.com", "page=all"],
+    ["detik.com", "single=1"]
+]
+
 # Create a list of replied posts
 if not os.path.isfile("replied_posts.txt"):
     replied_posts = []
@@ -25,12 +32,14 @@ else:
 
 # Get the list of posts to reply to
 for post in subreddit.new(limit=5):
-    if post.id not in replied_posts and "tribunnews" in post.domain and not "page=all" in post.url:
-        print(post.url + "?page=all")
-        post.reply("Here's a link to show all pages:\n\n" + post.url + "?page=all")
-        replied_posts.append(post.id)
+    for site in sites:
+        if post.id not in replied_posts and site[0] in post.domain and not site[1] in post.url:
+            print(post.url + "?" + site[1])
+            post.reply("Here's a link to show all pages:\n\n" + post.url + "?" + site[1])
+            replied_posts.append(post.id)
 
 # Write a list of replied posts into a file
 with open("replied_posts.txt", "w") as f:
     for post_id in replied_posts:
         f.write(post_id + "\n")
+
