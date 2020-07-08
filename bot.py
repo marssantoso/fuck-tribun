@@ -44,16 +44,16 @@ def message(url):
     return message + url
 
 # Send reply
-def reply(url, query):
-    newurl = urlparse(url)._replace(query=query).geturl()
+def reply_post(post, query):
+    newurl = urlparse(post.url)._replace(query=query).geturl()
     print(newurl)
     post.reply(message(newurl))
 
 # Get the list of posts to reply to
-for post in subreddit.new(limit=5):
+for post in subreddit.new(limit=1):
     for site in sites:
         if post_matches(post, site[0], site[1]):
-            reply(post.url, site[1])
+            reply_post(post, site[1])
             replied_posts.append(post.id)
 
 # Write a list of replied posts into a file
