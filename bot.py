@@ -5,6 +5,7 @@ import os
 
 from pathlib import Path
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Load env
 env_path = Path('.') / '.env'
@@ -30,12 +31,22 @@ else:
         replied_posts = replied_posts.split("\n")
         replied_posts = list(filter(None, replied_posts))
 
+# Format message
+def message(url):
+    message = "Here's a link to show all pages:\n\n"
+    return message + url
+
+# Send reply
+def reply(url, query):
+    newurl = urlparse(url)._replace(query=query).geturl()
+    print(newurl)
+    post.reply(message(newurl))
+
 # Get the list of posts to reply to
 for post in subreddit.new(limit=5):
     for site in sites:
         if post.id not in replied_posts and site[0] in post.domain and not site[1] in post.url:
-            print(post.url + "?" + site[1])
-            post.reply("Here's a link to show all pages:\n\n" + post.url + "?" + site[1])
+            reply(post.url, site[1])
             replied_posts.append(post.id)
 
 # Write a list of replied posts into a file
